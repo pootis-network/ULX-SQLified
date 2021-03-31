@@ -34,8 +34,9 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	end
 
 	--Are they already banned?
-	local BanStatus = ULX_DB:prepare("SELECT BanID, Length FROM bans WHERE OSteamiD = ? LIMIT 1;")
-	BanStatus:setString( 1, steamid )
+	local BanStatus = ULX_DB:prepare("SELECT BanID, ban_len FROM ba_bans WHERE steamid = ? LIMIT 1;")
+	local SteamID64 = util.SteamIDTo64(steamid)
+	BanStatus:setString( 1, SteamID64 )
 	function BanStatus.onSuccess()
 		local data = BanStatus:getData()
 		local row = data[1]
@@ -185,10 +186,11 @@ function ULib.refreshBans()
 
 	function BanList:onSuccess( data )
 		for i = 1, #data do
+			local LeL = util.SteamIDFrom64(data[i]['steamid'])
 			if data[i]['name'] != nil then
-				table.insert( ULib.bans, tonumber(data[i]['steamid']) )ULib.bans[data[i]['steamid']] = { unban = tonumber(data[i]['ban_len']), admin = data[i]['a_name'], reason = data[i]['reason'], name = data[i]['name'], time = tonumber(data[i]['ban_time']), modified_admin = data[i]['a_name'], modified_time = tonumber(data[i]['ban_time']) }
+				table.insert( ULib.bans, tonumber(LeL) )ULib.bans[LeL] = { unban = tonumber(data[i]['ban_len']), admin = data[i]['a_name'], reason = data[i]['reason'], name = data[i]['name'], time = tonumber(data[i]['ban_time']), modified_admin = data[i]['a_name'], modified_time = tonumber(data[i]['ban_time']) }
 			else
-				table.insert( ULib.bans, tonumber(data[i]['steamid']) )ULib.bans[data[i]['steamid']] = { unban = tonumber(data[i]['ban_len']), admin = data[i]['a_name'], reason = data[i]['reason'], time = tonumber(data[i]['ban_time']), modified_admin = data[i]['a_name'], modified_time = tonumber(data[i]['ban_time']) }
+				table.insert( ULib.bans, tonumber(LeL) )ULib.bans[LeL] = { unban = tonumber(data[i]['ban_len']), admin = data[i]['a_name'], reason = data[i]['reason'], time = tonumber(data[i]['ban_time']), modified_admin = data[i]['a_name'], modified_time = tonumber(data[i]['ban_time']) }
 			end
 			--^^ ULX Ban Info
 			---------------------------------
@@ -197,7 +199,7 @@ function ULib.refreshBans()
 			end
 			---------------------------------
 			local t = {}
-			t[data[i]['steamid']] = ULib.bans[data[i]['steamid']]
+			t[LeL] = ULib.bans[LeL]
 			xgui.addData( {}, "bans", t ) -- This will error out on startup (Most Times, GMod 13's Addon Loading is fucked), but that's fine, all ban data gets loaded already
 		end
 
