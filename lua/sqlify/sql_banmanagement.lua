@@ -9,7 +9,7 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	-- No SteamID / Time, stop the script
 	if steamid == nil then return end
 	if time == nil then return end
-
+	print("DBG1: "..steamid) 
 	-- No Name!? Insert a false one
 	if (name == nil) then
 		if SQL_NoSteamName == true then
@@ -27,7 +27,7 @@ function ULib.addBan( steamid, time, reason, name, admin )
 
 	--Setup Admin Information
 	local AdminName = "CONSOLE";
-	local AdminSteam = "CONSOLE";
+	local AdminSteam = "0";
 	if admin != nil && admin:IsPlayer() then
 		AdminName = admin:Nick()
 		AdminSteam = admin:SteamID()
@@ -36,6 +36,8 @@ function ULib.addBan( steamid, time, reason, name, admin )
 	--Are they already banned?
 	local BanStatus = ULX_DB:prepare("SELECT BanID, ban_len FROM ba_bans WHERE steamid = ? LIMIT 1;")
 	local SteamID64 = util.SteamIDTo64(steamid)
+	print("DBG2: "..steamid)
+	print("DBG3: "..SteamID64)
 	BanStatus:setString( 1, SteamID64 )
 	function BanStatus.onSuccess()
 		local data = BanStatus:getData()
@@ -90,6 +92,7 @@ function SQL_InsertBan(steamid, name, BanLength, AdminName, AdminSteam, reason)
 	AddBanQuery:setNumber( 9, 0) -- unban_time, will be unset.
 	AddBanQuery:setString( 10, "") -- unban reason, will be unset.
 	AddBanQuery:setNumber( 11, SQL_SERVERID ) -- server ID
+	print("DBG4: "..steamid)
 	function AddBanQuery.onSuccess()
 		print("[ULX SQLify] - Ban Added!");
 		if name == nil then
@@ -113,7 +116,7 @@ function SQL_InsertBan(steamid, name, BanLength, AdminName, AdminSteam, reason)
 	AddBanQuery:start()
 
 	-- Regardless of outcome Kick player From Server
-	RunConsoleCommand('kickid',steamid,"You've been banned from the server - Reason: ".. SQL_Escape(reason));
+	RunConsoleCommand('kickid',steamid,"You've been banned from the server ");
 end
 
 function SQL_ModifyBan(name, BanLength, reason, time, AdminName, steamid)
@@ -127,6 +130,7 @@ function SQL_ModifyBan(name, BanLength, reason, time, AdminName, steamid)
 	UpdateBanQuery:setNumber( 2, BanLength )
 	UpdateBanQuery:setString( 3, SQL_Escape(reason) )
 	local SteamID64 = util.SteamIDTo64(steamid)
+	print("DBG5: "..steamid)
 	UpdateBanQuery:setString( 4, SteamID64 )
 	function UpdateBanQuery.onSuccess()
 		print("[ULX SQLify] - Ban Modified!");
@@ -187,6 +191,7 @@ function ULib.refreshBans()
 	function BanList:onSuccess( data )
 		for i = 1, #data do
 			local LeL = util.SteamIDFrom64(data[i]['steamid'])
+			
 			if data[i]['name'] != nil then
 				table.insert( ULib.bans, tonumber(LeL) )ULib.bans[LeL] = { unban = tonumber(data[i]['ban_len']), admin = data[i]['a_name'], reason = data[i]['reason'], name = data[i]['name'], time = tonumber(data[i]['ban_time']), modified_admin = data[i]['a_name'], modified_time = tonumber(data[i]['ban_time']) }
 			else
