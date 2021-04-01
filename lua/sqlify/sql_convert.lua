@@ -4,7 +4,7 @@
 include('sqlify/sql_config.lua')
 ------------------
 local Bans = 0;
-
+--[[
 function SQL_ConvertBan(steamid, name, BanLength, Time, AdminName, AdminSteam, Reason, MAdmin, MTime)
 	--Insert Ban
 	-- local AddBanQuery = ULX_DB:query("INSERT INTO bans VALUES ('','"..steamid.."','"..SQL_Escape(name).."','"..BanLength.."','"..Time.."','"..SQL_Escape(AdminName).."','"..AdminSteam.."','"..SQL_Escape(Reason).."','"..SQL_SERVERID.."','"..MAdmin.."','"..MTime.."');");
@@ -48,3 +48,6 @@ function SQL_Convert()
 end
 
 SQL_Convert();
+]]
+
+--todo: fix this

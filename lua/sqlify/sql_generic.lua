@@ -25,5 +25,6 @@ function SQL_ComIDtoSteamID(cid)
   local a = steam64 % 2 == 0 and 0 or 1
   local b = math.abs(6561197960265728 - steam64 - a) / 2
   local sid = "STEAM_0:" .. a .. ":" .. (a == 1 and b -1 or b)
+  print("sid:"..sid)
   return sid
 end

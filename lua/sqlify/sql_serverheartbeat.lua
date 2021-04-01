@@ -33,18 +33,18 @@ function SQL_QueryDatabaseForServer()
 		-- Query The Database to see if server exists and retrieve the Server's ID
 		if (#data == 0) then
 			-- If Database does not have IP and port create a new row and populate it accordingly
-			print("[ULX GB] - Server not present, creating...");
+			print("[ULX SQLify] - Server not present, creating...");
 			SQL_InsertNewServer()
 		elseif (#data == 1) then
 			-- There should be only one entry
 			SQL_SERVERID = tonumber(row['ServerID']);
 			SQL_UpdateServerName();
-			print("[ULX GB] - ServerID Set To: ".. SQL_SERVERID);
+			print("[ULX SQLify] - ServerID Set To: ".. SQL_SERVERID);
 		else
-			print("[ULX GB] (UpdateName) - Error: Multiple entries found for IPAddress "..IPAddress.." and Port "..HostPort)
+			print("[ULX SQLify] (UpdateName) - Error: Multiple entries found for IPAddress "..IPAddress.." and Port "..HostPort)
 		end
 	end
-	HeartbeatQuery.onError = function(db, err) print('[ULX GB] (HeartbeatQuery) - Error: ', err) end
+	HeartbeatQuery.onError = function(db, err) print('[ULX SQLify] (HeartbeatQuery) - Error: ', err) end
 	HeartbeatQuery:start()
 
 end
@@ -58,9 +58,9 @@ function SQL_UpdateServerName()
   UpdateName:setString( 1, HostName )
   UpdateName:setNumber( 2, SQL_SERVERID )
 	function UpdateName:onSuccess()
-		print("[ULX GB] - Updated HostName Successfully!");
+		print("[ULX SQLify] - Updated HostName Successfully!");
 	end
-	function UpdateName:onError( err, sql ) print('[ULX GB] (UpdateName) - Error: ', err) end
+	function UpdateName:onError( err, sql ) print('[ULX SQLify] (UpdateName) - Error: ', err) end
 	UpdateName:start()
 
 end
@@ -77,11 +77,11 @@ function SQL_InsertNewServer()
   NewServer:setString( 2, HostPort )
   NewServer:setString( 3, HostName )
   function NewServer:onSuccess( data )
-		print("[ULX GB] - Inserted New Server!");
+		print("[ULX SQLify] - Inserted New Server!");
 		SQL_QueryDatabaseForServer()
 	end
 	function NewServer:onError(err)
-		print('[ULX GB] (NewServer) - Error: ', err);
+		print('[ULX SQLify] (NewServer) - Error: ', err);
 		SQL_QueryDatabaseForServer()
 	end
 
